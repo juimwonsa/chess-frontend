@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import type { Game, AnalysisMove } from "./types/chess";
-import { GameList } from "./components/GameList";
 import { AnalysisBoard } from "./components/AnalysisBoard";
-import { EvaluationChart } from "./components/EvaluationChart"; // 차트도 별도 컴포넌트로 분리했다고 가정
+import { EvaluationChart } from "./components/EvaluationChart";
+import { GameList } from "./components/GameList";
 
 const SERVER_IP = "168.107.23.245";
 
@@ -18,7 +18,7 @@ function App() {
     axios.get(`http://${SERVER_IP}:8000/games/list`).then((res) => setGames(res.data));
   }, []);
 
-  const handleSelectGame = async (gameId: string) => {
+  const handleAnalyze = async (gameId: string) => {
     setLoading(true);
     try {
       const res = await axios.get(`http://${SERVER_IP}:8000/analyze/full/${gameId}`);
@@ -28,21 +28,24 @@ function App() {
       setLoading(false);
     }
   };
-
+  // App.tsx의 return 부분 확인
   return (
-    <div style={{ display: "flex", height: "100vh", backgroundColor: "#f8f9fa" }}>
-      <GameList games={games} selectedGameId={selectedGame?._id} onSelectGame={handleSelectGame} />
+    <div style={{ display: "flex", height: "100vh" }}>
+      <GameList games={games} onSelectGame={handleAnalyze} selectedGameId={selectedGame?._id} />
 
-      <main style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+      <main style={{ flex: 1, padding: "20px" }}>
         {loading ? (
-          <div>분석 중... ⚙️</div>
+          <h2>분석 중입니다...</h2>
         ) : selectedGame ? (
-          <div style={{ display: "flex", gap: "40px" }}>
+          <div style={{ display: "flex", gap: "20px" }}>
+            {/* 컴포넌트가 정상적으로 로드되었는지 여기서 확인 가능 */}
             <AnalysisBoard position={boardPosition} />
-            <EvaluationChart analysis={analysis} onHoverMove={(pos) => setBoardPosition(pos)} />
+            <EvaluationChart analysis={analysis} onHoverMove={setBoardPosition} />
           </div>
         ) : (
-          <div>게임을 선택해 주세요.</div>
+          <div style={{ textAlign: "center", marginTop: "100px" }}>
+            <h2>분석할 게임을 왼쪽 목록에서 선택해 주세요!</h2>
+          </div>
         )}
       </main>
     </div>
