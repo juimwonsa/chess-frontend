@@ -15,13 +15,17 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://${SERVER_IP}:8000/games/list`).then((res) => setGames(res.data));
+    axios
+      .get(`http://${SERVER_IP}:8000/games/list`)
+      .then((res) => setGames(res.data));
   }, []);
 
   const handleAnalyze = async (gameId: string) => {
     setLoading(true);
     try {
-      const res = await axios.get(`http://${SERVER_IP}:8000/analyze/full/${gameId}`);
+      const res = await axios.get(
+        `http://${SERVER_IP}:8000/analyze/full/${gameId}`,
+      );
       setAnalysis(res.data.details);
       setSelectedGame(games.find((g) => g._id === gameId) || null);
     } finally {
@@ -31,16 +35,24 @@ function App() {
   // App.tsx의 return 부분 확인
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      <GameList games={games} onSelectGame={handleAnalyze} selectedGameId={selectedGame?._id} />
+      <GameList
+        games={games}
+        onSelectGame={handleAnalyze}
+        selectedGameId={selectedGame?._id}
+      />
 
-      <main style={{ flex: 1, padding: "20px" }}>
+      <main style={{ flex: 1, height: "100vh", overflow: "auto" }}>
         {loading ? (
           <h2>분석 중입니다...</h2>
         ) : selectedGame ? (
-          <div style={{ display: "flex", gap: "20px" }}>
-            {/* 컴포넌트가 정상적으로 로드되었는지 여기서 확인 가능 */}
+          <div
+            style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}
+          >
             <AnalysisBoard position={boardPosition} />
-            <EvaluationChart analysis={analysis} onHoverMove={setBoardPosition} />
+            <EvaluationChart
+              analysis={analysis}
+              onHoverMove={setBoardPosition}
+            />
           </div>
         ) : (
           <div style={{ textAlign: "center", marginTop: "100px" }}>
